@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penetration Testing Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .summary-panel {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .summary-card {
+            text-align: center;
+            padding: 10px;
+            flex: 1;
+        }
+        .summary-card h3 {
+            margin: 10px 0;
+            color: #555;
+        }
+        .summary-card span {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        .module-section {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .module-section h2 {
+            margin-bottom: 10px;
+        }
+        .log-panel {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #222;
+            color: #fff;
+            border-radius: 5px;
+            height: 150px;
+            overflow-y: auto;
+        }
+        .module-controls {
+            margin-bottom: 10px;
+        }
+        .module-controls input, .module-controls button {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        .module-controls button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .module-controls button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>Penetration Testing Toolkit</div>
+        <div>
+            <a href="#">Home</a>
+            <a href="#">Scan Modules</a>
+            <a href="#">Reports</a>
+            <a href="#">Settings</a>
+            <a href="#">Export</a>
+        </div>
+    </nav>
+    <div id="app">
+        <h1>Penetration Testing Dashboard</h1>
+        <div class="summary-panel">
+            <div class="summary-card">
+                <h3>Total Scanned IPs</h3>
+                <span id="total-ips">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>Open Ports Found</h3>
+                <span id="open-ports">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>Successful Logins</h3>
+                <span id="successful-logins">0</span>
+            </div>
+            <div class="summary-card">
+                <h3>Detected Vulnerabilities</h3>
+                <span id="vulnerabilities">0</span>
+            </div>
+        </div>
+        <div class="module-section" id="port-scanner-section">
+            <h2>Port Scanner</h2>
+            <div class="module-controls">
+                <input type="text" id="port-scan-target" placeholder="Target IP/Domain">
+                <input type="text" id="port-range" placeholder="Port Range (e.g., 1-1000)">
+                <button onclick="startPortScan()">Start Port Scan</button>
+            </div>
+            <table id="port-scanner-table">
+                <thead>
+                    <tr>
+                        <th>Port</th>
+                        <th>Status</th>
+                        <th>Service</th>
+                        <th>Vulnerabilities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table will be dynamically populated -->
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section" id="brute-force-section">
+            <h2>Brute-Force Module</h2>
+            <div class="module-controls">
+                <input type="text" id="brute-force-target" placeholder="Target IP/Domain">
+                <input type="text" id="username" placeholder="Username">
+                <input type="text" id="wordlist" placeholder="Wordlist Path">
+                <button onclick="startBruteForce()">Start Brute-Force</button>
+            </div>
+            <canvas id="brute-force-chart" width="400" height="200"></canvas>
+        </div>
+        <div class="log-panel" id="log-panel">
+            <h3>Activity Log</h3>
+            <ul id="log-list">
+                <!-- Logs will be dynamically populated -->
+            </ul>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

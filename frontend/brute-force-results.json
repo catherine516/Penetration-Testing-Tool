@@ -1,0 +1,6 @@
+{
+    "attempts": [
+        { "username": "admin", "password": "1234", "success": false },
+        { "username": "admin", "password": "password", "success": true }
+    ]
+}

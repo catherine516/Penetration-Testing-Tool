@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penetration Testing Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .container { max-width: 800px; margin: auto; }
+        .section { margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 8px; text-align: left; }
+        .log { background: #f9f9f9; padding: 10px; border: 1px solid #ccc; height: 150px; overflow-y: auto; }
+        button { padding: 10px 15px; background: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .strength-bar { height: 10px; width: 100%; background: #ccc; margin-top: 5px; }
+        .strength-bar span { display: block; height: 100%; }
+        .recommendations { background: #f9f9f9; padding: 10px; border: 1px solid #ccc; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Penetration Testing Tool</h1>
+
+        <!-- Port Scanner Section -->
+        <div class="section">
+            <h2>Port Scanner</h2>
+            <label>Target: <input type="text" id="port-scan-target"></label>
+            <label>Port Range: <input type="text" id="port-range"></label>
+            <button onclick="startPortScan()">Run Port Scan</button>
+            <table id="port-scanner-table">
+                <thead>
+                    <tr>
+                        <th>Port</th>
+                        <th>Status</th>
+                        <th>Service</th>
+                        <th>OS</th>
+                        <th>Vulnerabilities</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Password Strength Checker Section -->
+        <div class="section">
+            <h2>Password Strength Checker</h2>
+            <label>Password: <input type="password" id="password-input" oninput="checkPasswordStrength()"></label>
+            <div class="strength-bar">
+                <span id="strength-indicator" style="width: 0%; background: red;"></span>
+            </div>
+            <p id="strength-text">Strength: Weak</p>
+        </div>
+
+        <!-- Threat Score Visualization Section -->
+        <div class="section">
+            <h2>Threat Score</h2>
+            <canvas id="threat-score-chart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Geo-IP Lookup Section -->
+        <div class="section">
+            <h2>Geo-IP Lookup</h2>
+            <label>Public IP: <input type="text" id="geo-ip-input"></label>
+            <button onclick="lookupGeoIP()">Lookup</button>
+            <p id="geo-ip-result"></p>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="section">
+            <h2>Recommendations</h2>
+            <div class="recommendations" id="recommendations"></div>
+        </div>
+
+        <!-- Activity Log Section -->
+        <div class="section">
+            <h2>Activity Log</h2>
+            <div class="log" id="log-list"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function logActivity(message) {
+            const logList = document.getElementById('log-list');
+            const logItem = document.createElement('div');
+            logItem.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logList.appendChild(logItem);
+        }
+
+        function startPortScan() {
+            const target = document.getElementById('port-scan-target').value;
+            const range = document.getElementById('port-range').value;
+
+            if (!target || !range) {
+                alert('Please enter both target and port range.');
+                return;
+            }
+
+            logActivity(`Starting port scan on ${target} with range ${range}...`);
+
+            // Simulate port scan results
+            setTimeout(() => {
+                const simulatedResults = [
+                    { port: 80, status: 'open', service: 'http', os: 'Ubuntu Linux', vulnerabilities: ['None'] },
+                    { port: 22, status: 'open', service: 'ssh', os: 'Ubuntu Linux', vulnerabilities: ['Weak password'] },
+                    { port: 443, status: 'open', service: 'https', os: 'Windows Server', vulnerabilities: ['None'] }
+                ];
+
+                const tableBody = document.querySelector('#port-scanner-table tbody');
+                tableBody.innerHTML = ''; // Clear previous results
+                simulatedResults.forEach(port => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${port.port}</td>
+                        <td>${port.status}</td>
+                        <td>${port.service}</td>
+                        <td>${port.os}</td>
+                        <td>${port.vulnerabilities.join(', ')}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                updateThreatScore(simulatedResults);
+                updateRecommendations(simulatedResults);
+                logActivity('Port scan completed.');
+            }, 2000); // Simulate a delay
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password-input').value;
+            const strengthIndicator = document.getElementById('strength-indicator');
+            const strengthText = document.getElementById('strength-text');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[@$!%*?&#]/.test(password)) strength++;
+
+            if (strength === 0) {
+                strengthIndicator.style.width = '0%';
+                strengthIndicator.style.background = 'red';
+                strengthText.textContent = 'Strength: Weak';
+            } else if (strength <= 2) {
+                strengthIndicator.style.width = '50%';
+                strengthIndicator.style.background = 'orange';
+                strengthText.textContent = 'Strength: Medium';
+            } else {
+                strengthIndicator.style.width = '100%';
+                strengthIndicator.style.background = 'green';
+                strengthText.textContent = 'Strength: Strong';
+            }
+        }
+
+        function updateThreatScore(results) {
+            const ctx = document.getElementById('threat-score-chart').getContext('2d');
+            const highRisk = results.filter(r => r.vulnerabilities.length > 0).length;
+            const lowRisk = results.length - highRisk;
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['High Risk', 'Low Risk'],
+                    datasets: [{
+                        data: [highRisk, lowRisk],
+                        backgroundColor: ['red', 'green']
+                    }]
+                }
+            });
+        }
+
+        function lookupGeoIP() {
+            const ip = document.getElementById('geo-ip-input').value;
+
+            if (!ip) {
+                alert('Please enter a public IP address.');
+                return;
+            }
+
+            logActivity(`Looking up Geo-IP for ${ip}...`);
+
+            // Simulate Geo-IP lookup
+            setTimeout(() => {
+                const simulatedGeoIP = `Location: United States, ISP: Comcast`;
+                document.getElementById('geo-ip-result').textContent = simulatedGeoIP;
+                logActivity('Geo-IP lookup completed.');
+            }, 2000);
+        }
+
+        function updateRecommendations(results) {
+            const recommendations = document.getElementById('recommendations');
+            recommendations.innerHTML = ''; // Clear previous recommendations
+
+            results.forEach(result => {
+                if (result.vulnerabilities.length > 0) {
+                    const rec = document.createElement('div');
+                    rec.textContent = `Close unused port ${result.port} (${result.service}).`;
+                    recommendations.appendChild(rec);
+                }
+            });
+
+            if (recommendations.innerHTML === '') {
+                recommendations.textContent = 'No recommendations. System is secure.';
+            }
+        }
+    </script>
+</body>
+</html>
